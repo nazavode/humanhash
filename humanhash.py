@@ -13,6 +13,7 @@ import sys
 if sys.version_info.major == 3:
     #Map returns an iterator in PY3K
     py3_map = map
+
     def map(*args, **kwargs):
         return [i for i in py3_map(*args, **kwargs)]
 
@@ -102,7 +103,7 @@ class HumanHasher(object):
         # Compress an arbitrary number of bytes to `words`.
         compressed = self.compress(bytes, words)
         # Map the compressed byte values through the word list.
-        return separator.join(self.wordlist[byte] for byte in compressed)
+        return separator.join(str(self.wordlist[byte]) for byte in compressed)
 
     @staticmethod
     def compress(bytes, target):
