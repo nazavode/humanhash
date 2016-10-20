@@ -64,6 +64,56 @@ DEFAULT_WORDLIST = (
     'zulu')
 
 
+def compress(bytes, target):
+    """
+    Compress a list of byte values to a fixed target length.
+
+        >>> bytes = [96, 173, 141, 13, 135, 27, 96, 149, 128, 130, 151]
+        >>> compress(bytes, 4)
+        [64, 145, 117, 21]
+
+    If there are less than the target number bytes, the input bytes will be returned
+
+        >>> compress(bytes, 15)
+        [96, 173, 141, 13, 135, 27, 96, 149, 128, 130, 151]
+    """
+
+    length = len(bytes)
+    if target >= length:
+        return bytes
+
+    # Split `bytes` into `target` segments.
+    seg_size = float(length) / float(target)
+    segments = [0] * target
+    # Use a simple XOR checksum-like function for compression.
+    for i, byte in enumerate(bytes):
+        seg_num = min(int(math.floor(i / seg_size)), target - 1)
+        segments[seg_num] = operator.xor(segments[seg_num], byte)
+
+    return segments
+
+
+def humanize(hexdigest, words=4, separator='-', wordlist=DEFAULT_WORDLIST):
+    """
+    Humanize a given hexadecimal digest.
+
+    Change the number of words output by specifying `words`. Change the
+    word separator with `separator`.
+
+        >>> digest = '60ad8d0d871b6095808297'
+        >>> humanize(digest)
+        'equal-monkey-lake-beryllium'
+    """
+
+    # Gets a list of byte values between 0-255.
+    bytes = map(lambda x: int(x, 16),
+                map(''.join, zip(hexdigest[::2], hexdigest[1::2])))
+    # Compress an arbitrary number of bytes to `words`.
+    compressed = compress(bytes, words)
+    # Map the compressed byte values through the word list.
+    return separator.join(str(wordlist[byte]) for byte in compressed)
+
+
 class HumanHasher(object):
 
     """
@@ -97,44 +147,7 @@ class HumanHasher(object):
             'equal-monkey-lake-beryllium'
         """
 
-        # Gets a list of byte values between 0-255.
-        bytes = map(lambda x: int(x, 16),
-                    map(''.join, zip(hexdigest[::2], hexdigest[1::2])))
-        # Compress an arbitrary number of bytes to `words`.
-        compressed = self.compress(bytes, words)
-        # Map the compressed byte values through the word list.
-        return separator.join(str(self.wordlist[byte]) for byte in compressed)
-
-    @staticmethod
-    def compress(bytes, target):
-
-        """
-        Compress a list of byte values to a fixed target length.
-
-            >>> bytes = [96, 173, 141, 13, 135, 27, 96, 149, 128, 130, 151]
-            >>> HumanHasher.compress(bytes, 4)
-            [64, 145, 117, 21]
-
-        If there are less than the target number bytes, the input bytes will be returned
-
-            >>> HumanHasher.compress(bytes, 15)
-            [96, 173, 141, 13, 135, 27, 96, 149, 128, 130, 151]
-        """
-
-        length = len(bytes)
-        if target >= length:
-            return bytes
-
-        # Split `bytes` into `target` segments.
-        seg_size = float(length) / float(target)
-        segments = [0] * target
-        seg_num = 0
-        # Use a simple XOR checksum-like function for compression.
-        for i, byte in enumerate(bytes):
-            seg_num = min(int(math.floor(i / seg_size)), target-1)
-            segments[seg_num] = operator.xor(segments[seg_num], byte)
-
-        return segments
+        return humanize(hexdigest=hexdigest, words=words, separator=separator, wordlist=self.wordlist)
 
     def uuid(self, **params):
 
@@ -147,8 +160,3 @@ class HumanHasher(object):
 
         digest = str(uuidlib.uuid4()).replace('-', '')
         return self.humanize(digest, **params), digest
-
-
-DEFAULT_HASHER = HumanHasher()
-uuid = DEFAULT_HASHER.uuid
-humanize = DEFAULT_HASHER.humanize
