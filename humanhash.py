@@ -94,7 +94,7 @@ class HumanHasher(object):
 
             >>> digest = '60ad8d0d871b6095808297'
             >>> HumanHasher().humanize(digest)
-            'sodium-magnesium-nineteen-hydrogen'
+            'equal-monkey-lake-beryllium'
         """
 
         # Gets a list of byte values between 0-255.
@@ -113,7 +113,7 @@ class HumanHasher(object):
 
             >>> bytes = [96, 173, 141, 13, 135, 27, 96, 149, 128, 130, 151]
             >>> HumanHasher.compress(bytes, 4)
-            [205, 128, 156, 96]
+            [64, 145, 117, 21]
 
         If there are less than the target number bytes, the input bytes will be returned
 

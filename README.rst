@@ -14,10 +14,10 @@ Example
     >>> humanhash.humanize(digest)
     'three-georgia-xray-jig'
     >>> humanhash.humanize(digest, words=6)
-    'high-mango-white-oregon-purple-charlie'
+    'stream-zebra-oregon-orange-earth-alaska'
 
-    >>> humanhash.uuid()
-    ('potato-oranges-william-friend', '9d2278759ae24698b1345525bd53358b')
+    >>> humanhash.uuid()  #doctest: +SKIP
+    ('west-green-may-maryland', '696a06f79e7143fa950c99878cdde034')
 
 Caveats
 -------
