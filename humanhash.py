@@ -6,23 +6,9 @@ functions. For tighter control over the output, see :class:`HumanHasher`.
 """
 
 import operator
-import uuid as uuidlib
+import uuid as stduuid
 import math
-import sys
-
-if sys.version_info.major == 3:
-    #Map returns an iterator in PY3K
-    py3_map = map
-
-    def map(*args, **kwargs):
-        return [i for i in py3_map(*args, **kwargs)]
-
-    #Functionality of xrange is in range now
-    xrange = range
-
-    #Reduce moved to functools
-    #http://www.artima.com/weblogs/viewpost.jsp?thread=98196
-    from functools import reduce
+import os
 
 
 DEFAULT_WORDLIST = (
@@ -104,59 +90,32 @@ def humanize(hexdigest, words=4, separator='-', wordlist=DEFAULT_WORDLIST):
         >>> humanize(digest)
         'equal-monkey-lake-beryllium'
     """
-
+    if len(wordlist) != 256:
+        raise ValueError("wordlist must have exactly 256 items")
     # Gets a list of byte values between 0-255.
-    bytes = map(lambda x: int(x, 16),
-                map(''.join, zip(hexdigest[::2], hexdigest[1::2])))
+    bytes = tuple(
+        map(lambda x: int(x, 16),
+            map(''.join, zip(hexdigest[::2], hexdigest[1::2])))
+    )
     # Compress an arbitrary number of bytes to `words`.
     compressed = compress(bytes, words)
     # Map the compressed byte values through the word list.
     return separator.join(str(wordlist[byte]) for byte in compressed)
 
 
-class HumanHasher(object):
+DEFAULT_HUMANIZER = humanize
 
-    """
-    Transforms hex digests to human-readable strings.
 
-    The format of these strings will look something like:
-    `victor-bacon-zulu-lima`. The output is obtained by compressing the input
-    digest to a fixed number of bytes, then mapping those bytes to one of 256
-    words. A default wordlist is provided, but you can override this if you
-    prefer.
+class HUUID(stduuid.UUID):
 
-    As long as you use the same wordlist, the output will be consistent (i.e.
-    the same digest will always render the same representation).
-    """
+    @property
+    def human(self):
+        return DEFAULT_HUMANIZER(self.hex)  # TODO: pass self.bytes directly
 
-    def __init__(self, wordlist=DEFAULT_WORDLIST):
-        if len(wordlist) != 256:
-            raise ValueError("Wordlist must have exactly 256 items")
-        self.wordlist = wordlist
+    def __str__(self):
+        return "{} ({})".format(self.human, super().__str__())
 
-    def humanize(self, hexdigest, words=4, separator='-'):
 
-        """
-        Humanize a given hexadecimal digest.
-
-        Change the number of words output by specifying `words`. Change the
-        word separator with `separator`.
-
-            >>> digest = '60ad8d0d871b6095808297'
-            >>> HumanHasher().humanize(digest)
-            'equal-monkey-lake-beryllium'
-        """
-
-        return humanize(hexdigest=hexdigest, words=words, separator=separator, wordlist=self.wordlist)
-
-    def uuid(self, **params):
-
-        """
-        Generate a UUID with a human-readable representation.
-
-        Returns `(human_repr, full_digest)`. Accepts the same keyword arguments
-        as :meth:`humanize` (they'll be passed straight through).
-        """
-
-        digest = str(uuidlib.uuid4()).replace('-', '')
-        return self.humanize(digest, **params), digest
+def uuid4():
+    """Generate a random UUID."""
+    return HUUID(bytes=os.urandom(16), version=4)
