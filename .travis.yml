@@ -1,0 +1,36 @@
+sudo: false
+language: python
+python:
+  - "2.7"
+  - "3.4"
+  - "3.5"
+
+# command to install dependencies
+install:
+  - "pip3 install pytest"
+  - "pip3 install pytest-cov"
+  - "pip3 install pytest-sugar"
+  - "pip3 install pytest-capturelog"
+  - "pip3 install coveralls"
+  - "pip3 install ."
+
+
+# command to run tests
+script:
+  - coverage run --source humanhash `which py.test`
+
+after_success:
+  - coveralls --rcfile=.coveragerc
+
+# notifications:
+notifications:
+  email:
+    recipients:
+      - federico.ficarelli@gmail.com
+    on_success: change
+    on_failure: always
+
+# branches:
+branches:
+  only:
+    - master

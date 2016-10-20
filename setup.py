@@ -5,17 +5,16 @@ from distutils.core import setup
 
 setup(
     name='humanhash3',
-    version='0.0.4',
+    version='0.0.5',
     description='Human-readable representations of digests.',
-    author='Zachary Voase',
-    author_email='z@zacharyvoase.com',
-    url='https://github.com/blag/humanhash',
+    author='Federico Ficarelli',
+    author_email='federico.ficarelli@gmail.com',
+    url='https://github.com/nazavode/humanhash',
     py_modules=['humanhash'],
     license='Public Domain',
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
-        'Intended Audience :: End Users/Desktop',
         'Topic :: Security',
         'Topic :: Utilities',
 
@@ -27,8 +26,5 @@ setup(
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.2',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
     ],
 )
