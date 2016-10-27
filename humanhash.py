@@ -6,9 +6,7 @@ functions. For tighter control over the output, see :class:`HumanHasher`.
 """
 
 import operator
-import uuid as stduuid
 import math
-import os
 
 
 DEFAULT_WORDLIST = (
