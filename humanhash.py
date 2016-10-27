@@ -101,21 +101,3 @@ def humanize(hexdigest, words=4, separator='-', wordlist=DEFAULT_WORDLIST):
     compressed = compress(bytes, words)
     # Map the compressed byte values through the word list.
     return separator.join(str(wordlist[byte]) for byte in compressed)
-
-
-DEFAULT_HUMANIZER = humanize
-
-
-class HUUID(stduuid.UUID):
-
-    @property
-    def human(self):
-        return DEFAULT_HUMANIZER(self.hex)  # TODO: pass self.bytes directly
-
-    def __str__(self):
-        return "{} ({})".format(self.human, super().__str__())
-
-
-def uuid4():
-    """Generate a random UUID."""
-    return HUUID(bytes=os.urandom(16), version=4)
